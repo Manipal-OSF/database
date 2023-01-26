@@ -16,7 +16,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AdminLogin'
-      summary: Read a spacecraft
+      summary: Admin login to supabase
       responses:
         200:
           description: The login session token
@@ -39,14 +39,16 @@ paths:
 
   /api/v1/dashboard/users:
     get:
-      summary: Get all fields of the user table
+      summary: Get all users
       responses:
         200:
-          description: All fields of the user table
+          description: Array of all users
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserFields'
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
         404:
           description: Failed to fetch fields
           content:
@@ -65,7 +67,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserField'
+              $ref: '#/components/schemas/User'
       summary: Update a user field
       responses:
         200:
@@ -76,6 +78,33 @@ paths:
                 $ref: '#/components/schemas/UserField'
         404:
           description: Failed to update field
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      summary: ""
+      responses:
+        200:
+          description: New user created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: Failed to update user
           content:
             application/json:
               schema:
@@ -98,43 +127,119 @@ components:
         supabaseKey:
           type: string
 
-    UserFieldArray:
+    UserArray:
       description: Array of user table fields
       required:
-        - fieldArray
+        - users
       properties:
-        fieldArray:
+        users:
           type: array
           items:
             properties:
               id:
-                $ref: '#/components/schemas/UserField'
+                $ref: '#/components/schemas/User'
 
-    # Update based on KP's existing db
-    UserField:
-      description: One user table field
+    User:
+      description: A user
       type: object
-    # Spacecraft:
-    #   type: object
-    #   required:
-    #     - id
-    #     - name
-    #     - type
-    #   properties:
-    #     id:
-    #       $ref: '#/components/schemas/SpacecraftId'
-    #     name:
-    #       type: string
-    #     type:
-    #       type: string
-    #       enum:
-    #         - capsule
-    #         - probe
-    #         - satellite
-    #         - spaceplane
-    #         - station
-    #     description:
-    #       type: string
+      required:
+        - uuid
+        - name
+        - designation
+        - registrationNumber
+        - phoneNumber
+        - email
+        - department
+        - year
+        - location
+      properties:
+        uuid:
+          type: string
+          description: An universally unique identification
+          example: 1
+        name:
+          type: string
+          description: The name of the user
+          example: "John"
+        title:
+          type: string
+          description: Honorary title for the user
+          enum:
+            - Founder
+            - CoFounder
+          example: "Founder"
+        designation:
+          type: array
+          description: Current designation(s) in the flat or normal hierarchies
+          items:
+            type: string
+            enum:
+              - Board
+              - Interim
+              - F1
+              - F2
+              - WC
+              - MC
+          example: "Board"
+        registrationNumber:
+          type: integer
+          description: The registration number of the user as provided by the college
+          example: 123456789
+        phoneNumber:
+          type: integer
+          description: The 10 digit phone number of the user
+          example: 1234567890
+        discord:
+          type: integer
+          description: The Discord ID of the user
+          example: 111111111111111111
+        github:
+          type: string
+          description: The GitHub ID of the user
+          example: "dhzdhd"
+        email:
+          type: string
+          description: The email ID of the user
+          format: email
+          example: "abc@gmail.com"
+        department:
+          type: array
+          description: The department(s) the user belongs to
+          items:
+            type: string
+            enum:
+              - Academics
+              - Development
+              - Relations
+              - Multimedia
+              - CreatorCollaboratorProgram
+          example: ["Academics", "Development"]
+        year:
+          type: integer
+          description: The current college year the user is in
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+          example: 1
+        remarks:
+          type: string
+          description: Remarks for a particular user as given by the Board
+          example: "Considered for Board"
+        strikes:
+          type: integer
+          description: Number of strikes for a particular user
+          default: 0
+          example: 5
+        location:
+          type: string
+          description: Current college city location of the user
+          enum:
+            - Manipal
+            - Bangalore
+          example: "Manipal"
+
     Error:
       type: object
       required:
