@@ -1,0 +1,17 @@
+[package]
+name = "api"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+
+[dependencies]
+shuttle-service = { version = "0.8.0", features = ["web-axum"] }
+axum = "0.6.4"
+sync_wrapper = "0.1.1"
+postgrest = "1.0"
+shuttle-secrets = "0.8.0"
+hyper = { version = "0.14.23", features = ["full"] }
+tokio = { version = "1.22.0", features = ["full"] }
+tower = "0.4.13"
