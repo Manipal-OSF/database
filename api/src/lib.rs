@@ -22,12 +22,14 @@ struct State {
 async fn axum(
     #[shuttle_secrets::Secrets] secret_store: SecretStore,
 ) -> shuttle_service::ShuttleAxum {
-    let supabase_url = match secret_store.get("SUPABASE_URL") {
-        Some(secret) => secret,
-        None => panic!("Supabase URL not provided!"),
-    };
+    let supabase_url = secret_store
+        .get("SUPABASE_URL")
+        .expect("Supabase URL not provided!");
+    let supabase_key = secret_store
+        .get("SUPABASE_KEY")
+        .expect("Supabase key not provided!");
 
-    let client = Postgrest::new(supabase_url);
+    let client = Postgrest::new(supabase_url).insert_header("apikey", supabase_key);
     let state = Arc::new(State { db_client: client });
 
     let router = Router::new()
