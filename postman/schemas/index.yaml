@@ -1,0 +1,151 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'Database API'
+  description: Intermediate API that interacts with the database and other OSF projects
+
+paths:
+  /api/v1/dashboard/login:
+    post:
+      requestBody:
+        description: 'Admin login to the supabase database'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminLogin'
+      summary: Read a spacecraft
+      responses:
+        200:
+          description: The login session token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSession'
+        404:
+          description: Wrong credentials entered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/dashboard/users:
+    get:
+      summary: Get all fields of the user table
+      responses:
+        200:
+          description: All fields of the user table
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFields'
+        404:
+          description: Failed to fetch fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserField'
+      summary: Update a user field
+      responses:
+        200:
+          description: User field updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserField'
+        404:
+          description: Failed to update field
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    AdminLogin:
+      description: Login schema
+      type: object
+      required:
+        - supabaseKey
+      properties:
+        supabaseKey:
+          type: string
+
+    UserFieldArray:
+      description: Array of user table fields
+      required:
+        - fieldArray
+      properties:
+        fieldArray:
+          type: array
+          items:
+            properties:
+              id:
+                $ref: '#/components/schemas/UserField'
+
+    # Update based on KP's existing db
+    UserField:
+      description: One user table field
+      type: object
+    # Spacecraft:
+    #   type: object
+    #   required:
+    #     - id
+    #     - name
+    #     - type
+    #   properties:
+    #     id:
+    #       $ref: '#/components/schemas/SpacecraftId'
+    #     name:
+    #       type: string
+    #     type:
+    #       type: string
+    #       enum:
+    #         - capsule
+    #         - probe
+    #         - satellite
+    #         - spaceplane
+    #         - station
+    #     description:
+    #       type: string
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: A human readable error message
+          type: string
+  
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+
+security:
+  - ApiKey: []
