@@ -8,10 +8,20 @@ publish = false
 
 [dependencies]
 shuttle-service = { version = "0.8.0", features = ["web-axum"] }
-axum = "0.6.4"
+axum = { version = "0.6.4", features = ["headers"] }
 sync_wrapper = "0.1.1"
 postgrest = "1.0"
 shuttle-secrets = "0.8.0"
 hyper = { version = "0.14.23", features = ["full"] }
 tokio = { version = "1.22.0", features = ["full"] }
 tower = "0.4.13"
+uuid = "1.2.2"
+serde_json = "1.0.91"
+serde = "1.0.152"
+axum-login = "0.4.1"
+rsa = { version = "0.8.1" }
+rand = "0.8.5"
+base64 = "0.21.0"
+
+[profile.dev.package.num-bigint-dig]
+opt-level = 3
