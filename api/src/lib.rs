@@ -1,11 +1,10 @@
 use std::sync::Arc;
 
-use axum::{routing::get, Router};
-use axum_login::{
-    axum_sessions::{async_session::MemoryStore as SessionMemoryStore, SessionLayer},
-    memory_store::MemoryStore as AuthMemoryStore,
-    AuthLayer, UserStore,
+use axum::{
+    routing::{get, post},
+    Router,
 };
+
 use postgrest::Postgrest;
 use shuttle_secrets::SecretStore;
 use sync_wrapper::SyncWrapper;
@@ -24,6 +23,12 @@ pub struct AppState {
     db_client: Postgrest,
 }
 
+impl AppState {
+    fn new(db_client: Postgrest) -> Self {
+        Self { db_client }
+    }
+}
+
 #[shuttle_service::main]
 async fn axum(
     #[shuttle_secrets::Secrets] secret_store: SecretStore,
@@ -35,18 +40,12 @@ async fn axum(
         .get("SUPABASE_KEY")
         .expect("Supabase key not provided!");
 
-    let secret = "hello";
-
-    let session_store = SessionMemoryStore::new();
-    let session_layer = SessionLayer::new(session_store, secret.as_bytes());
-
     let client = Postgrest::new(supabase_url).insert_header("apikey", supabase_key);
-    let state = Arc::new(AppState { db_client: client });
+    let state = Arc::new(AppState::new(client));
 
     let router = Router::new()
         .route("/", get(index))
-        .route("/api/v1/dashboard/login", get(login))
-        .route("/api/v1/dashboard/logout", get(login))
+        .route("/api/v1/dashboard/login", post(login))
         .with_state(state);
 
     let sync_wrapper = SyncWrapper::new(router);
