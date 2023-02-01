@@ -8,7 +8,10 @@ use super::auth::Claims;
 
 pub async fn get_all_users(
     claims: Claims,
-    State(state): State<Arc<AppState>>,
+    // State(state): State<Arc<AppState>>,
 ) -> Result<String, ApiError> {
-    Ok(format!("{claims:?}"))
+    Ok(format!(
+        "Welcome to the protected area :)\nYour data:\n{:?}",
+        claims
+    ))
 }

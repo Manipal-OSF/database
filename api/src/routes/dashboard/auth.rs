@@ -73,7 +73,7 @@ pub async fn login(
 
     verify(json.hash.as_str(), json.salt.as_str(), &payload.api_key)?;
 
-    let claims = Claims { exp: 100000 };
+    let claims = Claims { exp: 10000000 };
 
     let token = encode(&Header::default(), &claims, &KEYS.encoding)
         .map_err(|_| ApiError::AuthenticationError)?;

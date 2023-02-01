@@ -25,8 +25,8 @@ pub struct AppState {
 }
 
 impl AppState {
-    fn new(db_client: Postgrest, secret: String) -> Self {
-        Self { db_client, secret }
+    fn new(db_client: Postgrest) -> Self {
+        Self { db_client }
     }
 }
 
@@ -44,7 +44,7 @@ async fn axum(
         .expect("Supabase key not provided!");
 
     let client = Postgrest::new(supabase_url).insert_header("apikey", supabase_key);
-    let state = Arc::new(AppState::new(client, secret));
+    let state = Arc::new(AppState::new(client));
 
     let router = Router::new()
         .route("/", get(index))
