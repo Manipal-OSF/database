@@ -13,7 +13,7 @@ use sync_wrapper::SyncWrapper;
 mod models;
 mod routes;
 
-use routes::dashboard::{access::get_all_users, auth::login};
+use routes::dashboard::{auth::login, users::get_all_users};
 
 async fn index() -> &'static str {
     // TODO Add documentation here

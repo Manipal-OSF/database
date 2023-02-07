@@ -29,9 +29,45 @@ pub struct LoginPayload {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Claims {
-    // Contains JWT expiry info
     exp: u32,
 }
+
+#[async_trait]
+impl<S> FromRequestParts<S> for Claims
+where
+    S: Send + Sync,
+{
+    type Rejection = ApiError;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        // Extract the token from the authorization header
+        let TypedHeader(Authorization(bearer)) = parts
+            .extract::<TypedHeader<Authorization<Bearer>>>()
+            .await
+            .map_err(|_| ApiError::AuthenticationError)?;
+
+        // Decode the user data
+        let token_data = decode::<Claims>(bearer.token(), &KEYS.decoding, &Validation::default())
+            .map_err(|_| ApiError::AuthenticationError)?;
+
+        Ok(token_data.claims)
+    }
+}
+
+struct Keys {
+    encoding: EncodingKey,
+    decoding: DecodingKey,
+}
+
+impl Keys {
+    fn new(secret: &[u8]) -> Self {
+        Self {
+            encoding: EncodingKey::from_secret(secret),
+            decoding: DecodingKey::from_secret(secret),
+        }
+    }
+}
+
 static KEYS: Lazy<Keys> = Lazy::new(|| {
     let secret = std::env::var("SECRET").expect("JWT_SECRET must be set");
     Keys::new(secret.as_bytes())
@@ -73,7 +109,7 @@ pub async fn login(
 
     verify(json.hash.as_str(), json.salt.as_str(), &payload.api_key)?;
 
-    let claims = Claims { exp: 10000000 };
+    let claims = Claims { exp: 2000000000 };
 
     let token = encode(&Header::default(), &claims, &KEYS.encoding)
         .map_err(|_| ApiError::AuthenticationError)?;
@@ -92,40 +128,5 @@ pub fn verify<'a>(hash: &'a str, salt: &'a str, password: &'a str) -> Result<(),
         Ok(())
     } else {
         Err(ApiError::AuthenticationError)
-    }
-}
-
-struct Keys {
-    encoding: EncodingKey,
-    decoding: DecodingKey,
-}
-
-impl Keys {
-    fn new(secret: &[u8]) -> Self {
-        Self {
-            encoding: EncodingKey::from_secret(secret),
-            decoding: DecodingKey::from_secret(secret),
-        }
-    }
-}
-
-#[async_trait]
-impl<S> FromRequestParts<S> for Claims
-where
-    S: Send + Sync,
-{
-    type Rejection = ApiError;
-
-    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
-        // Extract the token from the authorization header
-        let TypedHeader(Authorization(bearer)) = parts
-            .extract::<TypedHeader<Authorization<Bearer>>>()
-            .await
-            .map_err(|_| ApiError::AuthenticationError)?;
-        // Decode the user data
-        let token_data = decode::<Claims>(bearer.token(), &KEYS.decoding, &Validation::default())
-            .map_err(|_| ApiError::AuthenticationError)?;
-
-        Ok(token_data.claims)
     }
 }
