@@ -4,11 +4,9 @@ use axum::{extract::State, Json};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    models::{auth::User, error::ApiError},
+    models::{auth::Claims, error::ApiError},
     AppState,
 };
-
-use super::auth::Claims;
 
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "PascalCase")]

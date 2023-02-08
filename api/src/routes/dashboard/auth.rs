@@ -1,4 +1,3 @@
-use std::fmt::Debug;
 use std::sync::Arc;
 
 use axum::extract::FromRequestParts;
@@ -8,29 +7,13 @@ use axum::http::request::Parts;
 use axum::{async_trait, RequestPartsExt, TypedHeader};
 use axum::{extract::State, Json};
 use base64::{engine::general_purpose, Engine};
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{decode, encode, Header, Validation};
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha512};
 
+use crate::models::auth::{AuthBody, AuthModel, Claims, Keys, LoginPayload};
 use crate::models::error::ApiError;
 use crate::AppState;
-
-#[derive(Deserialize)]
-pub struct AuthModel {
-    hash: String,
-    salt: String,
-}
-
-#[derive(Deserialize, Serialize)]
-pub struct LoginPayload {
-    api_key: String,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-pub struct Claims {
-    exp: u32,
-}
 
 #[async_trait]
 impl<S> FromRequestParts<S> for Claims
@@ -54,39 +37,10 @@ where
     }
 }
 
-struct Keys {
-    encoding: EncodingKey,
-    decoding: DecodingKey,
-}
-
-impl Keys {
-    fn new(secret: &[u8]) -> Self {
-        Self {
-            encoding: EncodingKey::from_secret(secret),
-            decoding: DecodingKey::from_secret(secret),
-        }
-    }
-}
-
 static KEYS: Lazy<Keys> = Lazy::new(|| {
     let secret = std::env::var("SECRET").expect("JWT_SECRET must be set");
     Keys::new(secret.as_bytes())
 });
-
-#[derive(Debug, Serialize)]
-pub struct AuthBody {
-    access_token: String,
-    token_type: String,
-}
-
-impl AuthBody {
-    fn new(access_token: String) -> Self {
-        Self {
-            access_token,
-            token_type: "Bearer".to_string(),
-        }
-    }
-}
 
 pub async fn login(
     State(state): State<Arc<AppState>>,
