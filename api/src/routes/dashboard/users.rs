@@ -27,6 +27,8 @@ pub async fn get_all_users(
     _claims: Claims,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<Vec<UserModel>>, ApiError> {
+    // * GET /api/v1/dashboard/users
+
     let user_vec = state
         .db_client
         .from("users")
@@ -48,7 +50,9 @@ pub async fn update_user(
     _claims: Claims,
     State(state): State<Arc<AppState>>,
     Json(payload): Json<UserModel>,
-) -> Result<String, ApiError> {
+) -> Result<Json<Vec<UserModel>>, ApiError> {
+    // * PATCH /api/v1/dashboard/users
+
     let resp = state
         .db_client
         .from("users")
@@ -67,20 +71,37 @@ pub async fn update_user(
             ApiError::AuthenticationError
         })?;
 
-    let str = resp.json::<Vec<UserModel>>().await.map_err(|e| {
+    let model = resp.json::<Vec<UserModel>>().await.map_err(|e| {
         println!("3 {e:?}");
         ApiError::AuthenticationError
     })?;
 
-    println!("{str:?}");
+    println!("{model:?}");
 
-    Ok("yus".to_string())
+    Ok(Json(model))
 }
 
 pub async fn create_user(
     _claims: Claims,
     State(state): State<Arc<AppState>>,
     Json(payload): Json<UserModel>,
-) -> Result<String, ApiError> {
-    Ok("".to_string())
+) -> Result<Json<Vec<UserModel>>, ApiError> {
+    // * POST /api/v1/dashboard/users
+
+    let resp = state
+        .db_client
+        .from("users")
+        .insert(serde_json::to_string(&payload).map_err(|e| ApiError::AuthenticationError)?)
+        .execute()
+        .await
+        .map_err(|e| ApiError::AuthenticationError)?;
+
+    let model = resp.json::<Vec<UserModel>>().await.map_err(|e| {
+        println!("3 {e:?}");
+        ApiError::AuthenticationError
+    })?;
+
+    println!("{model:?}");
+
+    Ok(Json(model))
 }
