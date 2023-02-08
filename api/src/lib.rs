@@ -44,13 +44,13 @@ async fn axum(
     } else {
         secret_store.get("SUPABASE_URL")
     }
-    .expect("Supabase URL not provided!");
+    .expect("Supabase URL not provided");
     let supabase_key = if cfg!(debug_assertions) {
         secret_store.get("DEV_SUPABASE_KEY")
     } else {
         secret_store.get("SUPABASE_KEY")
     }
-    .expect("Supabase key not provided!");
+    .expect("Supabase key not provided");
 
     let client = Postgrest::new(supabase_url).insert_header("apikey", supabase_key);
     let state = Arc::new(AppState::new(client));
