@@ -20,7 +20,7 @@ impl IntoResponse for ApiError {
             ),
             Self::ServerError(message) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Server Error\n{message}"),
+                format!("Server Error | {message}"),
             ),
         };
 
