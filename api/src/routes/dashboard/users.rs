@@ -43,3 +43,38 @@ pub async fn get_all_users(
 
     Ok(Json(user_vec))
 }
+
+pub async fn update_user(
+    _claims: Claims,
+    State(state): State<Arc<AppState>>,
+    Json(payload): Json<UserModel>,
+) -> Result<String, ApiError> {
+    let resp = state
+        .db_client
+        .from("users")
+        .eq(
+            "RegistrationNumber",
+            payload.registration_number.to_string(),
+        )
+        .update(serde_json::to_string(&payload).map_err(|_| ApiError::AuthenticationError)?)
+        .execute()
+        .await
+        .map_err(|_| ApiError::AuthenticationError)?;
+
+    let str = resp
+        .json()
+        .await
+        .map_err(|_| ApiError::AuthenticationError)?;
+
+    println!("{str:?}");
+
+    Ok("".to_string())
+}
+
+pub async fn create_user(
+    _claims: Claims,
+    State(state): State<Arc<AppState>>,
+    Json(payload): Json<UserModel>,
+) -> Result<String, ApiError> {
+    Ok("".to_string())
+}
