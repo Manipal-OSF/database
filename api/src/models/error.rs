@@ -8,6 +8,7 @@ use serde_json::json;
 #[derive(Debug)]
 pub enum ApiError {
     AuthenticationError,
+    ServerError(String),
 }
 
 impl IntoResponse for ApiError {
@@ -16,6 +17,10 @@ impl IntoResponse for ApiError {
             Self::AuthenticationError => (
                 StatusCode::UNAUTHORIZED,
                 "Authentication failed! Invalid credentials.".to_string(),
+            ),
+            Self::ServerError(message) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Server Error\n{message}"),
             ),
         };
 
