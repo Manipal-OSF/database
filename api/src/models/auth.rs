@@ -1,5 +1,14 @@
-use jsonwebtoken::{DecodingKey, EncodingKey};
+use axum::extract::FromRequestParts;
+use axum::headers::authorization::Bearer;
+use axum::headers::Authorization;
+use axum::http::request::Parts;
+use axum::{async_trait, RequestPartsExt, TypedHeader};
+use jsonwebtoken::{decode, DecodingKey, EncodingKey, Validation};
 use serde::{Deserialize, Serialize};
+
+use crate::routes::dashboard::auth::KEYS;
+
+use super::error::ApiError;
 
 #[derive(Deserialize)]
 pub struct AuthModel {
@@ -15,6 +24,28 @@ pub struct LoginPayload {
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Claims {
     pub exp: u32,
+}
+
+#[async_trait]
+impl<S> FromRequestParts<S> for Claims
+where
+    S: Send + Sync,
+{
+    type Rejection = ApiError;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        // Extract the token from the authorization header
+        let TypedHeader(Authorization(bearer)) = parts
+            .extract::<TypedHeader<Authorization<Bearer>>>()
+            .await
+            .map_err(|_| ApiError::AuthenticationError)?;
+
+        // Decode the user data
+        let token_data = decode::<Claims>(bearer.token(), &KEYS.decoding, &Validation::default())
+            .map_err(|_| ApiError::AuthenticationError)?;
+
+        Ok(token_data.claims)
+    }
 }
 
 #[derive(Debug, Serialize)]

@@ -11,8 +11,8 @@ use crate::{
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct UserModel {
-    name: String,
     registration_number: u64,
+    name: String,
     title: Option<String>,
     phone_number: u64,
     email: String,
@@ -56,19 +56,25 @@ pub async fn update_user(
             "RegistrationNumber",
             payload.registration_number.to_string(),
         )
-        .update(serde_json::to_string(&payload).map_err(|_| ApiError::AuthenticationError)?)
+        .update(serde_json::to_string(&payload).map_err(|e| {
+            println!("1 {e:?}");
+            ApiError::AuthenticationError
+        })?)
         .execute()
         .await
-        .map_err(|_| ApiError::AuthenticationError)?;
+        .map_err(|e| {
+            println!("2 {e:?}");
+            ApiError::AuthenticationError
+        })?;
 
-    let str = resp
-        .json()
-        .await
-        .map_err(|_| ApiError::AuthenticationError)?;
+    let str = resp.json::<Vec<UserModel>>().await.map_err(|e| {
+        println!("3 {e:?}");
+        ApiError::AuthenticationError
+    })?;
 
     println!("{str:?}");
 
-    Ok("".to_string())
+    Ok("yus".to_string())
 }
 
 pub async fn create_user(
