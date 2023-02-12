@@ -6,37 +6,37 @@
 
 <div class="overflow-x-auto">
 	<table class="table w-full">
-		<!-- head -->
 		<thead>
 			<tr>
-				<th />
-				<th>{data.registrationNumber}</th>
-				<th>Job</th>
-				<th>Favorite Color</th>
+				<th>Index</th>
+				<th>Registration Number</th>
+				<th>Name</th>
+				<th>Title</th>
+				<th>Phone Number</th>
+				<th>Email</th>
+				<th>Designation</th>
+				<th>Department</th>
+				<th>Year</th>
+				<th>Remarks</th>
+				<th>Strikes</th>
 			</tr>
 		</thead>
 		<tbody>
-			<!-- row 1 -->
-			<tr>
-				<th>1</th>
-				<td>Cy Ganderton</td>
-				<td>Quality Control Specialist</td>
-				<td>Blue</td>
-			</tr>
-			<!-- row 2 -->
-			<tr class="hover">
-				<th>2</th>
-				<td>Hart Hagerty</td>
-				<td>Desktop Support Technician</td>
-				<td>Purple</td>
-			</tr>
-			<!-- row 3 -->
-			<tr>
-				<th>3</th>
-				<td>Brice Swyre</td>
-				<td>Tax Accountant</td>
-				<td>Red</td>
-			</tr>
+			{#each data.users as item, i}
+				<tr>
+					<th>{i + 1}</th>
+					<td>{item.registrationNumber}</td>
+					<td>{item.name}</td>
+					<td>{item.title}</td>
+					<td>{item.phoneNumber}</td>
+					<td>{item.email}</td>
+					<td>{item.designation}</td>
+					<td>{item.department}</td>
+					<td>{item.year}</td>
+					<td>{item.remarks}</td>
+					<td>{item.strikes}</td>
+				</tr>
+			{/each}
 		</tbody>
 	</table>
 </div>
