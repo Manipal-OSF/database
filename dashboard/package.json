@@ -38,6 +38,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"carbon-icons-svelte": "^11.4.0",
 		"daisyui": "^2.50.0"
 	}
 }

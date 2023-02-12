@@ -21,7 +21,18 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		headers: { Authorization: `Bearer ${cookies.get('token')}` }
 	});
 
-	const data: Array<any> = await resp.json();
+	const data: Array<{
+		RegistrationNumber: number;
+		Name: string;
+		Title: string | undefined;
+		PhoneNumber: number;
+		Email: string;
+		Designation: string | undefined;
+		Department: string | undefined;
+		Year: number;
+		Remarks: string | undefined;
+		Strikes: number;
+	}> = await resp.json();
 
 	return {
 		users: data.map((e) => {
