@@ -58,15 +58,23 @@
 		</tbody>
 	</table>
 	<div class="modal" id="modal">
-		<form method="post" use:enhance class="modal-box">
+		<form
+			method="post"
+			class="modal-box"
+			use:enhance={({ data }) => {
+				data.set('registrationNumber', buffer.registrationNumber.toString());
+
+				// return async (res) => {};
+			}}
+		>
 			<h3 class="font-bold text-lg">Registration Number - {$index?.registrationNumber}</h3>
-			<div class="py-4">
+			<div class="pt-4">
 				<label class="label" for="name">
 					<span class="label-text">Name</span>
 				</label>
 				<input type="text" id="name" class="input input-bordered w-full" bind:value={buffer.name} />
 			</div>
-			<div class="py-4">
+			<div class="py-2">
 				<label class="label" for="title">
 					<span class="label-text">Title</span>
 				</label>
@@ -77,7 +85,7 @@
 					bind:value={buffer.title}
 				/>
 			</div>
-			<div class="py-4">
+			<div class="py-2">
 				<label class="label" for="phoneNumber">
 					<span class="label-text">Phone Number</span>
 				</label>
@@ -88,7 +96,7 @@
 					bind:value={buffer.phoneNumber}
 				/>
 			</div>
-			<div class="py-4">
+			<div class="py-2">
 				<label class="label" for="email">
 					<span class="label-text">Email</span>
 				</label>
@@ -99,7 +107,7 @@
 					bind:value={buffer.email}
 				/>
 			</div>
-			<div class="py-4">
+			<div class="py-2">
 				<label class="label" for="designation">
 					<span class="label-text">Designation</span>
 				</label>
@@ -110,7 +118,7 @@
 					bind:value={buffer.designation}
 				/>
 			</div>
-			<div class="py-4">
+			<div class="py-2">
 				<label class="label" for="department">
 					<span class="label-text">Department</span>
 				</label>
@@ -121,13 +129,13 @@
 					bind:value={buffer.department}
 				/>
 			</div>
-			<div class="py-4">
+			<div class="py-2">
 				<label class="label" for="year">
 					<span class="label-text">Year</span>
 				</label>
 				<input type="text" id="year" class="input input-bordered w-full" bind:value={buffer.year} />
 			</div>
-			<div class="py-4">
+			<div class="py-2">
 				<label class="label" for="remarks">
 					<span class="label-text">Remarks</span>
 				</label>
@@ -138,7 +146,7 @@
 					bind:value={buffer.remarks}
 				/>
 			</div>
-			<div class="py-4">
+			<div class="py-2">
 				<label class="label" for="strikes">
 					<span class="label-text">Strikes</span>
 				</label>
