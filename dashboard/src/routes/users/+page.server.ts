@@ -1,4 +1,4 @@
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 export const ssr = true;
 
@@ -34,6 +34,8 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		Strikes: number;
 	}> = await resp.json();
 
+	console.log(data);
+
 	return {
 		users: data.map((e) => {
 			return {
@@ -50,4 +52,13 @@ export const load: PageServerLoad = async ({ cookies }) => {
 			} satisfies UserModel;
 		})
 	} satisfies { users: UserModel[] };
+};
+
+export const actions: Actions = {
+	default: async (event) => {
+		const data = await event.request.formData();
+		const key = data.get('apikey');
+
+		console.log('elo');
+	}
 };
