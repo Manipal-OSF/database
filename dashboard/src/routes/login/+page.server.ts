@@ -1,4 +1,4 @@
-import type { Actions } from '@sveltejs/kit';
+import { fail, type Actions } from '@sveltejs/kit';
 
 export const actions: Actions = {
 	default: async (event) => {
@@ -10,7 +10,7 @@ export const actions: Actions = {
 			const resp = await event.fetch('http://127.0.0.1:8000/api/v1/dashboard/login', {
 				method: 'POST',
 				body: JSON.stringify({ api_key: key }),
-				headers: { 'Content-Type': 'application/json' }
+				headers: { 'Content-Type': 'application/json' },
 			});
 			json = await resp.json();
 		} catch (err) {
@@ -21,7 +21,7 @@ export const actions: Actions = {
 			event.cookies.set('token', json['access_token'], { maxAge: 60 * 60 });
 			return { success: true };
 		} else {
-			return { success: false };
+			return fail(500, { message: 'Incorrect key!' });
 		}
-	}
+	},
 };

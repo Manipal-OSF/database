@@ -18,7 +18,7 @@ export interface UserModel {
 export const load: PageServerLoad = async ({ cookies }) => {
 	const resp = await fetch('http://127.0.0.1:8000/api/v1/dashboard/users', {
 		method: 'GET',
-		headers: { Authorization: `Bearer ${cookies.get('token')}` }
+		headers: { Authorization: `Bearer ${cookies.get('token')}` },
 	});
 
 	const data: Array<{
@@ -34,8 +34,6 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		Strikes: number;
 	}> = await resp.json();
 
-	console.log(data);
-
 	return {
 		users: data.map((val) => {
 			return {
@@ -48,9 +46,9 @@ export const load: PageServerLoad = async ({ cookies }) => {
 				department: val['Department'],
 				year: val['Year'],
 				remarks: val['Remarks'],
-				strikes: val['Strikes']
+				strikes: val['Strikes'],
 			} satisfies UserModel;
-		})
+		}),
 	} satisfies { users: UserModel[] };
 };
 
@@ -58,27 +56,23 @@ export const actions: Actions = {
 	default: async (event) => {
 		const data = await event.request.formData();
 
-		const registrationNumber = Number.parseInt(data.get('registrationNumber')!.toString());
-		console.log(registrationNumber);
+		const body: UserModel = {
+			registrationNumber: Number(data.get('registrationNumber')),
+			name: String(data.get('name')),
+			title: String(data.get('title')),
+			phoneNumber: Number(data.get('phoneNumber')),
+			email: String(data.get('email')),
+			designation: String(data.get('designation')),
+			department: String(data.get('department')),
+			year: Number(data.get('year')),
+			remarks: String(data.get('remarks')),
+			strikes: Number(data.get('strikes')),
+		};
 
-		// get body from
-		// const body = {
-		// 	registrationNumber: data.get('registrationNumber'),
-		// 	name: e['Name'],
-		// 	title: e['Title'],
-		// 	phoneNumber: e['PhoneNumber'],
-		// 	email: e['Email'],
-		// 	designation: e['Designation'],
-		// 	department: e['Department'],
-		// 	year: e['Year'],
-		// 	remarks: e['Remarks'],
-		// 	strikes: e['Strikes']
-		// } satisfies UserModel;
-
-		const resp = await event.fetch('http://127.0.0.1:8000/api/v1/dashboard/login', {
+		const resp = await event.fetch('http://127.0.0.1:8000/api/v1/dashboard/users', {
 			method: 'PATCH',
-			body: JSON.stringify({}),
-			headers: { 'Content-Type': 'application/json' }
+			body: JSON.stringify(body),
+			headers: { 'Content-Type': 'application/json' },
 		});
 		const json = await resp.json();
 		console.log(JSON.stringify(json));
@@ -87,5 +81,5 @@ export const actions: Actions = {
 			return { success: true };
 		}
 		return { success: false };
-	}
+	},
 };

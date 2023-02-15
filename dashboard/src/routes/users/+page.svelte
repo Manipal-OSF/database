@@ -10,7 +10,6 @@
 	let index: Writable<UserModel | undefined> = writable(undefined);
 
 	let buffer: UserModel = data.users[0];
-	$: console.log(JSON.stringify(buffer));
 </script>
 
 <div class="overflow-x-auto w-full">
@@ -40,8 +39,9 @@
 							on:click={() => {
 								$index = item;
 								buffer = item;
-							}}><Edit /></a
-						>
+							}}>
+							<Edit />
+						</a>
 					</th>
 					<th>{item.registrationNumber}</th>
 					<td>{item.name}</td>
@@ -63,10 +63,7 @@
 			class="modal-box"
 			use:enhance={({ data }) => {
 				data.set('registrationNumber', buffer.registrationNumber.toString());
-
-				// return async (res) => {};
-			}}
-		>
+			}}>
 			<h3 class="font-bold text-lg">Registration Number - {$index?.registrationNumber}</h3>
 			<div class="pt-4">
 				<label class="label" for="name">
@@ -82,8 +79,7 @@
 					type="text"
 					id="title"
 					class="input input-bordered w-full"
-					bind:value={buffer.title}
-				/>
+					bind:value={buffer.title} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="phoneNumber">
@@ -93,8 +89,7 @@
 					type="text"
 					id="phoneNumber"
 					class="input input-bordered w-full"
-					bind:value={buffer.phoneNumber}
-				/>
+					bind:value={buffer.phoneNumber} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="email">
@@ -104,8 +99,7 @@
 					type="text"
 					id="email"
 					class="input input-bordered w-full"
-					bind:value={buffer.email}
-				/>
+					bind:value={buffer.email} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="designation">
@@ -115,8 +109,7 @@
 					type="text"
 					id="designation"
 					class="input input-bordered w-full"
-					bind:value={buffer.designation}
-				/>
+					bind:value={buffer.designation} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="department">
@@ -126,8 +119,7 @@
 					type="text"
 					id="department"
 					class="input input-bordered w-full"
-					bind:value={buffer.department}
-				/>
+					bind:value={buffer.department} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="year">
@@ -143,8 +135,7 @@
 					type="text"
 					id="remarks"
 					class="input input-bordered w-full"
-					bind:value={buffer.remarks}
-				/>
+					bind:value={buffer.remarks} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="strikes">
@@ -154,8 +145,7 @@
 					type="text"
 					id="strikes"
 					class="input input-bordered w-full"
-					bind:value={buffer.strikes}
-				/>
+					bind:value={buffer.strikes} />
 			</div>
 			<div class="modal-action">
 				<button type="submit" class="btn">Submit</button>
