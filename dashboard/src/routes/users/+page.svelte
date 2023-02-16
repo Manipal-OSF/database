@@ -110,7 +110,7 @@
 				};
 			}}>
 			{#if $action === 'update'}
-				<h3 class="font-bold text-lg">Registration Number - {$index?.registrationNumber}</h3>
+				<h3 class="font-bold text-lg">Update {$index?.registrationNumber}</h3>
 			{:else}
 				<h3 class="font-bold text-lg">Create a new user</h3>
 			{/if}

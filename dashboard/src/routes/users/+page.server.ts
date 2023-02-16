@@ -1,4 +1,6 @@
 import type { Actions, PageServerLoad } from './$types';
+import { SERVER_URL } from '$env/static/private';
+import { error } from '@sveltejs/kit';
 
 export const ssr = true;
 
@@ -16,9 +18,15 @@ export interface UserModel {
 }
 
 export const load: PageServerLoad = async ({ cookies }) => {
-	const resp = await fetch('http://127.0.0.1:8000/api/v1/dashboard/users', {
+	const token = cookies.get('token');
+
+	if (typeof token === 'undefined') {
+		throw error(401, 'Not logged in / Session expired');
+	}
+
+	const resp = await fetch(`${SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/users`, {
 		method: 'GET',
-		headers: { Authorization: `Bearer ${cookies.get('token')}` },
+		headers: { Authorization: `Bearer ${token}` },
 	});
 
 	const data: Array<UserModel> = await resp.json();
@@ -48,14 +56,17 @@ export const actions: Actions = {
 			strikes: Number(data.get('strikes')),
 		};
 
-		const resp = await event.fetch('http://127.0.0.1:8000/api/v1/dashboard/users', {
-			method: method,
-			body: JSON.stringify(body),
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${event.cookies.get('token')}`,
-			},
-		});
+		const resp = await event.fetch(
+			`${SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/users`,
+			{
+				method: method,
+				body: JSON.stringify(body),
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${event.cookies.get('token')}`,
+				},
+			}
+		);
 
 		if (resp.status === 200) {
 			return { success: true };

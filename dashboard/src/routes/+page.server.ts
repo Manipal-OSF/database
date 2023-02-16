@@ -1,4 +1,5 @@
 import { fail, type Actions } from '@sveltejs/kit';
+import { SERVER_URL } from '$env/static/private';
 
 export const actions: Actions = {
 	default: async (event) => {
@@ -7,11 +8,14 @@ export const actions: Actions = {
 
 		let json;
 		try {
-			const resp = await event.fetch('http://127.0.0.1:8000/api/v1/dashboard/login', {
-				method: 'POST',
-				body: JSON.stringify({ api_key: key }),
-				headers: { 'Content-Type': 'application/json' },
-			});
+			const resp = await event.fetch(
+				`${SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/login`,
+				{
+					method: 'POST',
+					body: JSON.stringify({ api_key: key }),
+					headers: { 'Content-Type': 'application/json' },
+				}
+			);
 			json = await resp.json();
 		} catch (err) {
 			json = undefined;
