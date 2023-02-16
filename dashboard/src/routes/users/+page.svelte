@@ -6,12 +6,28 @@
 	import type { Writable } from 'svelte/store';
 	import type { UserModel } from './+page.server';
 	import { enhance } from '$app/forms';
+	import { fade, fly } from 'svelte/transition';
+	import { CheckmarkOutline, Warning } from 'carbon-icons-svelte';
 
 	export let data: PageData;
 
-	let index: Writable<UserModel | undefined> = writable(undefined);
+	const defaultUser: UserModel = {
+		registrationNumber: 0,
+		name: '',
+		title: '',
+		phoneNumber: 0,
+		email: '@.com',
+		designation: '',
+		department: '',
+		year: 1,
+		remarks: '',
+		strikes: 0,
+	};
+
 	let action: Writable<'update' | 'create'> = writable('update');
-	let buffer: Writable<UserModel> = writable(data.users[0]);
+	let buffer: Writable<UserModel> = writable(defaultUser);
+
+	let alertState: Writable<'neutral' | 'error' | 'success'> = writable('neutral');
 
 	const onSubmit = async () => {
 		document.getElementById('close')?.click();
@@ -28,20 +44,9 @@
 			class="btn"
 			on:click={() => {
 				$action = 'create';
-				$buffer = {
-					registrationNumber: 0,
-					name: '',
-					title: '',
-					phoneNumber: 0,
-					email: '@.com',
-					designation: '',
-					department: '',
-					year: 1,
-					remarks: '',
-					strikes: 0,
-				};
+				$buffer = defaultUser;
 			}}>
-			<Add size={24} />
+			Create User
 		</a>
 	</div>
 	<div class="px-10 py-4 overflow-x-scroll">
@@ -70,7 +75,6 @@
 								class="btn"
 								on:click={() => {
 									$action = 'update';
-									$index = item;
 									$buffer = item;
 								}}>
 								<Edit />
@@ -104,13 +108,22 @@
 					data.set('method', 'POST');
 				}
 
-				return async ({ update }) => {
-					// Reset if successful
+				return async ({ result, update }) => {
+					if (result.type !== 'success') {
+						$alertState = 'error';
+					} else {
+						$alertState = 'success';
+					}
+
+					setTimeout(() => {
+						$alertState = 'neutral';
+					}, 3000);
+
 					await update({ reset: false });
 				};
 			}}>
 			{#if $action === 'update'}
-				<h3 class="font-bold text-lg">Update {$index?.registrationNumber}</h3>
+				<h3 class="font-bold text-lg">Update {$buffer.registrationNumber}</h3>
 			{:else}
 				<h3 class="font-bold text-lg">Create a new user</h3>
 			{/if}
@@ -120,7 +133,8 @@
 						<span class="label-text">Registration Number</span>
 					</label>
 					<input
-						type="text"
+						type="number"
+						min="0"
 						id="registrationNumber"
 						name="registrationNumber"
 						class="input input-bordered w-full"
@@ -154,7 +168,8 @@
 					<span class="label-text">Phone Number</span>
 				</label>
 				<input
-					type="text"
+					type="number"
+					min="0"
 					id="phoneNumber"
 					name="phoneNumber"
 					class="input input-bordered w-full"
@@ -165,7 +180,7 @@
 					<span class="label-text">Email</span>
 				</label>
 				<input
-					type="text"
+					type="email"
 					id="email"
 					name="email"
 					class="input input-bordered w-full"
@@ -198,7 +213,8 @@
 					<span class="label-text">Year</span>
 				</label>
 				<input
-					type="text"
+					type="number"
+					min="1"
 					id="year"
 					name="year"
 					class="input input-bordered w-full"
@@ -220,7 +236,8 @@
 					<span class="label-text">Strikes</span>
 				</label>
 				<input
-					type="text"
+					type="number"
+					min="0"
 					id="strikes"
 					name="strikes"
 					class="input input-bordered w-full"
@@ -233,3 +250,21 @@
 		</form>
 	</div>
 </div>
+
+{#if $alertState !== 'neutral'}
+	<div
+		in:fly={{ y: 100 }}
+		out:fade
+		class={`alert alert-${$alertState === 'error' ? 'error' : 'success'} shadow-lg`}>
+		<div>
+			{#if $alertState === 'error'}
+				<Warning size={24} />
+			{:else}
+				<CheckmarkOutline size={24} />
+			{/if}
+			<span>
+				{$alertState === 'error' ? 'Error' : 'Success'}
+			</span>
+		</div>
+	</div>
+{/if}
