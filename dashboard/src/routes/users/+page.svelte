@@ -1,75 +1,142 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Edit from 'carbon-icons-svelte/lib/Edit.svelte';
+	import Add from 'carbon-icons-svelte/lib/Add.svelte';
 	import { writable } from 'svelte/store';
 	import type { Writable } from 'svelte/store';
 	import type { UserModel } from './+page.server';
 	import { enhance } from '$app/forms';
 
 	export let data: PageData;
-	let index: Writable<UserModel | undefined> = writable(undefined);
 
-	let buffer: UserModel = data.users[0];
+	let index: Writable<UserModel | undefined> = writable(undefined);
+	let action: Writable<'update' | 'create'> = writable('update');
+	let buffer: Writable<UserModel> = writable(data.users[0]);
+
+	const onSubmit = async () => {
+		document.getElementById('close')?.click();
+	};
+
+	$: console.log($buffer);
 </script>
 
-<div class="overflow-x-auto w-full">
-	<table class="table hover w-full">
-		<thead>
-			<tr>
-				<th />
-				<th>Registration Number</th>
-				<th>Name</th>
-				<th>Title</th>
-				<th>Phone Number</th>
-				<th>Email</th>
-				<th>Designation</th>
-				<th>Department</th>
-				<th>Year</th>
-				<th>Remarks</th>
-				<th>Strikes</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each data.users as item, i}
+<div class="w-screen h-screen">
+	<div class="w-screen flex justify-between px-10 py-4">
+		<div />
+		<a
+			href="#modal"
+			class="btn"
+			on:click={() => {
+				$action = 'create';
+				$buffer = {
+					registrationNumber: 0,
+					name: '',
+					title: '',
+					phoneNumber: 0,
+					email: '@.com',
+					designation: '',
+					department: '',
+					year: 1,
+					remarks: '',
+					strikes: 0,
+				};
+			}}>
+			<Add size={24} />
+		</a>
+	</div>
+	<div class="px-10 py-4 overflow-x-scroll">
+		<table class="table overflow-x-scroll hover w-full">
+			<thead>
 				<tr>
-					<th>
-						<a
-							href="#modal"
-							class="btn"
-							on:click={() => {
-								$index = item;
-								buffer = item;
-							}}>
-							<Edit />
-						</a>
-					</th>
-					<th>{item.registrationNumber}</th>
-					<td>{item.name}</td>
-					<td>{item.title ?? 'NULL'}</td>
-					<td>{item.phoneNumber}</td>
-					<td>{item.email}</td>
-					<td>{item.designation ?? 'NULL'}</td>
-					<td>{item.department ?? 'NULL'}</td>
-					<td>{item.year}</td>
-					<td>{item.remarks ?? 'NULL'}</td>
-					<td>{item.strikes}</td>
+					<td class="border-blue-500 border-[1px]" />
+					<th class="border-blue-500 border-[1px]">Registration Number</th>
+					<th class="border-blue-500 border-[1px]">Name</th>
+					<th class="border-blue-500 border-[1px]">Title</th>
+					<th class="border-blue-500 border-[1px]">Phone Number</th>
+					<th class="border-blue-500 border-[1px]">Email</th>
+					<th class="border-blue-500 border-[1px]">Designation</th>
+					<th class="border-blue-500 border-[1px]">Department</th>
+					<th class="border-blue-500 border-[1px]">Year</th>
+					<th class="border-blue-500 border-[1px]">Remarks</th>
+					<th class="border-blue-500 border-[1px]">Strikes</th>
 				</tr>
-			{/each}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{#each data.users as item, i}
+					<tr>
+						<td class="border-blue-300 border-[1px] ">
+							<a
+								href="#modal"
+								class="btn"
+								on:click={() => {
+									$action = 'update';
+									$index = item;
+									$buffer = item;
+								}}>
+								<Edit />
+							</a>
+						</td>
+						<td class="border-blue-300 border-[1px]">{item.registrationNumber}</td>
+						<td class="border-blue-300 border-[1px]">{item.name}</td>
+						<td class="border-blue-300 border-[1px]">{item.title ?? 'NULL'}</td>
+						<td class="border-blue-300 border-[1px]">{item.phoneNumber}</td>
+						<td class="border-blue-300 border-[1px]">{item.email}</td>
+						<td class="border-blue-300 border-[1px]">{item.designation ?? 'NULL'}</td>
+						<td class="border-blue-300 border-[1px]">{item.department ?? 'NULL'}</td>
+						<td class="border-blue-300 border-[1px]">{item.year}</td>
+						<td class="border-blue-300 border-[1px]">{item.remarks ?? 'NULL'}</td>
+						<td class="border-blue-300 border-[1px]">{item.strikes}</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</div>
 	<div class="modal" id="modal">
+		<!-- Add 2 form endpoints -->
 		<form
 			method="post"
 			class="modal-box"
 			use:enhance={({ data }) => {
-				data.set('registrationNumber', buffer.registrationNumber.toString());
+				if ($action === 'update') {
+					data.set('registrationNumber', $buffer.registrationNumber.toString());
+					data.set('method', 'PATCH');
+				} else {
+					data.set('method', 'POST');
+				}
+
+				return async ({ update }) => {
+					// Reset if successful
+					await update({ reset: false });
+				};
 			}}>
-			<h3 class="font-bold text-lg">Registration Number - {$index?.registrationNumber}</h3>
+			{#if $action === 'update'}
+				<h3 class="font-bold text-lg">Registration Number - {$index?.registrationNumber}</h3>
+			{:else}
+				<h3 class="font-bold text-lg">Create a new user</h3>
+			{/if}
+			{#if $action === 'create'}
+				<div class="pt-4">
+					<label class="label" for="registrationNumber">
+						<span class="label-text">Registration Number</span>
+					</label>
+					<input
+						type="text"
+						id="registrationNumber"
+						name="registrationNumber"
+						class="input input-bordered w-full"
+						bind:value={$buffer.registrationNumber} />
+				</div>
+			{/if}
 			<div class="pt-4">
 				<label class="label" for="name">
 					<span class="label-text">Name</span>
 				</label>
-				<input type="text" id="name" class="input input-bordered w-full" bind:value={buffer.name} />
+				<input
+					type="text"
+					id="name"
+					name="name"
+					class="input input-bordered w-full"
+					bind:value={$buffer.name} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="title">
@@ -78,8 +145,9 @@
 				<input
 					type="text"
 					id="title"
+					name="title"
 					class="input input-bordered w-full"
-					bind:value={buffer.title} />
+					bind:value={$buffer.title} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="phoneNumber">
@@ -88,8 +156,9 @@
 				<input
 					type="text"
 					id="phoneNumber"
+					name="phoneNumber"
 					class="input input-bordered w-full"
-					bind:value={buffer.phoneNumber} />
+					bind:value={$buffer.phoneNumber} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="email">
@@ -98,8 +167,9 @@
 				<input
 					type="text"
 					id="email"
+					name="email"
 					class="input input-bordered w-full"
-					bind:value={buffer.email} />
+					bind:value={$buffer.email} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="designation">
@@ -108,8 +178,9 @@
 				<input
 					type="text"
 					id="designation"
+					name="designation"
 					class="input input-bordered w-full"
-					bind:value={buffer.designation} />
+					bind:value={$buffer.designation} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="department">
@@ -118,14 +189,20 @@
 				<input
 					type="text"
 					id="department"
+					name="department"
 					class="input input-bordered w-full"
-					bind:value={buffer.department} />
+					bind:value={$buffer.department} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="year">
 					<span class="label-text">Year</span>
 				</label>
-				<input type="text" id="year" class="input input-bordered w-full" bind:value={buffer.year} />
+				<input
+					type="text"
+					id="year"
+					name="year"
+					class="input input-bordered w-full"
+					bind:value={$buffer.year} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="remarks">
@@ -134,8 +211,9 @@
 				<input
 					type="text"
 					id="remarks"
+					name="remarks"
 					class="input input-bordered w-full"
-					bind:value={buffer.remarks} />
+					bind:value={$buffer.remarks} />
 			</div>
 			<div class="py-2">
 				<label class="label" for="strikes">
@@ -144,12 +222,13 @@
 				<input
 					type="text"
 					id="strikes"
+					name="strikes"
 					class="input input-bordered w-full"
-					bind:value={buffer.strikes} />
+					bind:value={$buffer.strikes} />
 			</div>
 			<div class="modal-action">
-				<button type="submit" class="btn">Submit</button>
-				<a href="#" class="btn">Close</a>
+				<button type="submit" class="btn" on:click={() => onSubmit()}>Submit</button>
+				<a href="#" id="close" class="btn">Close</a>
 			</div>
 		</form>
 	</div>

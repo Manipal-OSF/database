@@ -21,33 +21,11 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		headers: { Authorization: `Bearer ${cookies.get('token')}` },
 	});
 
-	const data: Array<{
-		RegistrationNumber: number;
-		Name: string;
-		Title: string | undefined;
-		PhoneNumber: number;
-		Email: string;
-		Designation: string | undefined;
-		Department: string | undefined;
-		Year: number;
-		Remarks: string | undefined;
-		Strikes: number;
-	}> = await resp.json();
+	const data: Array<UserModel> = await resp.json();
 
 	return {
 		users: data.map((val) => {
-			return {
-				registrationNumber: val['RegistrationNumber'],
-				name: val['Name'],
-				title: val['Title'],
-				phoneNumber: val['PhoneNumber'],
-				email: val['Email'],
-				designation: val['Designation'],
-				department: val['Department'],
-				year: val['Year'],
-				remarks: val['Remarks'],
-				strikes: val['Strikes'],
-			} satisfies UserModel;
+			return val;
 		}),
 	} satisfies { users: UserModel[] };
 };
@@ -55,6 +33,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
 export const actions: Actions = {
 	default: async (event) => {
 		const data = await event.request.formData();
+		const method = String(data.get('method'));
 
 		const body: UserModel = {
 			registrationNumber: Number(data.get('registrationNumber')),
@@ -70,12 +49,13 @@ export const actions: Actions = {
 		};
 
 		const resp = await event.fetch('http://127.0.0.1:8000/api/v1/dashboard/users', {
-			method: 'PATCH',
+			method: method,
 			body: JSON.stringify(body),
-			headers: { 'Content-Type': 'application/json' },
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${event.cookies.get('token')}`,
+			},
 		});
-		const json = await resp.json();
-		console.log(JSON.stringify(json));
 
 		if (resp.status === 200) {
 			return { success: true };

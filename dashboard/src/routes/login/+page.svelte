@@ -29,6 +29,7 @@
 			update();
 		};
 	}}>
+	<h1 class="text-5xl pb-10">OSF Database</h1>
 	<input
 		class="input input-bordered input-secondary"
 		type="password"

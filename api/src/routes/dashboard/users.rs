@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Deserialize, Serialize, Debug)]
-#[serde(rename_all = "PascalCase")]
+#[serde(rename_all = "camelCase")]
 pub struct UserModel {
     registration_number: u64,
     name: String,
@@ -54,7 +54,7 @@ pub async fn update_user(
         .db_client
         .from("users")
         .eq(
-            "RegistrationNumber",
+            "registrationNumber",
             payload.registration_number.to_string(),
         )
         .update(

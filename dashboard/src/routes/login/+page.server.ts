@@ -17,11 +17,15 @@ export const actions: Actions = {
 			json = undefined;
 		}
 
+		if (typeof json === 'undefined') {
+			return fail(500, { message: 'Server down' });
+		}
+
 		if (json['access_token']) {
 			event.cookies.set('token', json['access_token'], { maxAge: 60 * 60 });
 			return { success: true };
 		} else {
-			return fail(500, { message: 'Incorrect key!' });
+			return fail(500, { message: 'Incorrect key' });
 		}
 	},
 };
