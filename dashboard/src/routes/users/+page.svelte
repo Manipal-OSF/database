@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Edit from 'carbon-icons-svelte/lib/Edit.svelte';
-	import Add from 'carbon-icons-svelte/lib/Add.svelte';
 	import { writable } from 'svelte/store';
 	import type { Writable } from 'svelte/store';
 	import type { UserModel } from './+page.server';
@@ -32,8 +31,6 @@
 	const onSubmit = async () => {
 		document.getElementById('close')?.click();
 	};
-
-	$: console.log($buffer);
 </script>
 
 <div class="w-screen h-screen">
@@ -96,7 +93,6 @@
 		</table>
 	</div>
 	<div class="modal" id="modal">
-		<!-- Add 2 form endpoints -->
 		<form
 			method="post"
 			class="modal-box"

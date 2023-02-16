@@ -7,6 +7,7 @@
 
 	let loading = writable(false);
 	let error = writable(false);
+	let errorMessage = writable('');
 </script>
 
 <form
@@ -20,8 +21,13 @@
 			if (result.type !== 'success') {
 				$error = true;
 
+				if (result.status === 500 && result.type === 'failure') {
+					$errorMessage = result.data?.message;
+				}
+
 				setTimeout(() => {
 					$error = false;
+					$errorMessage = '';
 				}, 3000);
 			} else {
 				await goto('users');
@@ -49,7 +55,7 @@
 	<div in:fly={{ y: 100 }} out:fade class="alert alert-error shadow-lg">
 		<div>
 			<Warning size={24} />
-			<span>Error! Invalid credentials</span>
+			<span>{$errorMessage === '' ? 'Error! Invalid credentials' : $errorMessage}</span>
 		</div>
 	</div>
 {/if}

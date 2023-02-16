@@ -1,6 +1,6 @@
 import type { Actions, PageServerLoad } from './$types';
 import { SERVER_URL } from '$env/static/private';
-import { error } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 export const ssr = true;
 
@@ -56,21 +56,25 @@ export const actions: Actions = {
 			strikes: Number(data.get('strikes')),
 		};
 
-		const resp = await event.fetch(
-			`${SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/users`,
-			{
-				method: method,
-				body: JSON.stringify(body),
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${event.cookies.get('token')}`,
-				},
-			}
-		);
+		try {
+			const resp = await event.fetch(
+				`${SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/users`,
+				{
+					method: method,
+					body: JSON.stringify(body),
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${event.cookies.get('token')}`,
+					},
+				}
+			);
 
-		if (resp.status === 200) {
-			return { success: true };
+			if (resp.status === 200) {
+				return { success: true };
+			}
+			return { success: false };
+		} catch (err) {
+			return fail(500, { message: 'Server down' });
 		}
-		return { success: false };
 	},
 };
