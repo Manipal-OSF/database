@@ -31,6 +31,7 @@
 			return;
 		}
 
+		// Get list of filtered users based on search regardless of column
 		let result = data.users.filter((item) => {
 			return Object.values(item).some((value) => {
 				return String(value).toLowerCase().includes(search.toLowerCase());
@@ -54,12 +55,14 @@
 	let alertState: Writable<'neutral' | 'error' | 'success'> = writable('neutral');
 
 	const onSubmit = async () => {
+		// Programmatically click the button as daisyUI does not expose JS controls to close modals.
 		document.getElementById('close')?.click();
 	};
 </script>
 
 <div class="w-screen h-screen">
 	<div class="w-screen flex justify-between px-4 md:px-10 py-4">
+		<!-- Filter UI -->
 		<div class="form-control">
 			<div class="input-group">
 				<button on:click={() => reset()} class="btn  btn-square">
@@ -75,6 +78,7 @@
 				</button>
 			</div>
 		</div>
+		<!-- Create a new user -->
 		<a
 			href="#modal"
 			class="btn btn-square"
@@ -150,6 +154,7 @@
 						$alertState = 'success';
 					}
 
+					// Remove the alert
 					setTimeout(() => {
 						$alertState = 'neutral';
 					}, 3000);
@@ -162,6 +167,7 @@
 			{:else}
 				<h3 class="font-bold text-lg">Create a new user</h3>
 			{/if}
+			<!-- Show registration number only when creating a user -->
 			{#if $action === 'create'}
 				<div class="pt-4">
 					<label class="label" for="registrationNumber">
