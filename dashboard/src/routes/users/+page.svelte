@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Edit from 'carbon-icons-svelte/lib/Edit.svelte';
+	import Add from 'carbon-icons-svelte/lib/Add.svelte';
 	import { writable } from 'svelte/store';
 	import type { Writable } from 'svelte/store';
 	import type { UserModel } from './+page.server';
 	import { enhance } from '$app/forms';
 	import { fade, fly } from 'svelte/transition';
-	import { CheckmarkOutline, Warning } from 'carbon-icons-svelte';
+	import { CheckmarkOutline, Reset, Search, Warning } from 'carbon-icons-svelte';
 
 	export let data: PageData;
 
@@ -23,8 +24,32 @@
 		strikes: 0,
 	};
 
+	let filtered = data.users;
+
+	const filter = (search: string) => {
+		if (search.trim() === '') {
+			return;
+		}
+
+		let result = data.users.filter((item) => {
+			return Object.values(item).some((value) => {
+				return String(value).toLowerCase().includes(search.toLowerCase());
+			});
+		});
+
+		if (result.length !== 0) {
+			filtered = result;
+		}
+	};
+
+	const reset = () => {
+		filtered = data.users;
+		search = '';
+	};
+
 	let action: Writable<'update' | 'create'> = writable('update');
 	let buffer: Writable<UserModel> = writable(defaultUser);
+	let search = '';
 
 	let alertState: Writable<'neutral' | 'error' | 'success'> = writable('neutral');
 
@@ -34,19 +59,33 @@
 </script>
 
 <div class="w-screen h-screen">
-	<div class="w-screen flex justify-between px-10 py-4">
-		<div />
+	<div class="w-screen flex justify-between px-4 md:px-10 py-4">
+		<div class="form-control">
+			<div class="input-group">
+				<button on:click={() => reset()} class="btn  btn-square">
+					<Reset size={24} />
+				</button>
+				<input
+					bind:value={search}
+					type="text"
+					placeholder="Filter"
+					class="input w-44 md:w-auto input-bordered" />
+				<button on:click={() => filter(search)} class="btn btn-square">
+					<Search size={24} />
+				</button>
+			</div>
+		</div>
 		<a
 			href="#modal"
-			class="btn"
+			class="btn btn-square"
 			on:click={() => {
 				$action = 'create';
 				$buffer = defaultUser;
 			}}>
-			Create User
+			<Add size={32} />
 		</a>
 	</div>
-	<div class="px-10 py-4 overflow-x-scroll">
+	<div class="px-4 md:px-10 py-4 overflow-x-scroll">
 		<table class="table overflow-x-scroll hover w-full">
 			<thead>
 				<tr>
@@ -64,7 +103,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each data.users as item, i}
+				{#each filtered as item, i}
 					<tr>
 						<td class="border-blue-300 border-[1px] ">
 							<a
