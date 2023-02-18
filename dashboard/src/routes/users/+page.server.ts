@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { SERVER_URL } from '$env/static/private';
+import { PUBLIC_SERVER_URL } from '$env/static/public';
 import { error, fail } from '@sveltejs/kit';
 
 export const ssr = true;
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		throw error(401, 'Not logged in / Session expired');
 	}
 
-	const resp = await fetch(`${SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/users`, {
+	const resp = await fetch(`${PUBLIC_SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/users`, {
 		method: 'GET',
 		headers: { Authorization: `Bearer ${token}` },
 	});
@@ -58,7 +58,7 @@ export const actions: Actions = {
 
 		try {
 			const resp = await event.fetch(
-				`${SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/users`,
+				`${PUBLIC_SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/users`,
 				{
 					method: method,
 					body: JSON.stringify(body),
