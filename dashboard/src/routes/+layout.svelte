@@ -2,4 +2,6 @@
 	import '../app.postcss';
 </script>
 
-<slot />
+<main class="h-screen w-screen flex flex-col items-center">
+	<slot />
+</main>
