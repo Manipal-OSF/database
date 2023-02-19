@@ -24,7 +24,7 @@
 		strikes: 0,
 	};
 
-	let filtered = data.users;
+	let filtered = writable(data.users);
 
 	const filter = (search: string) => {
 		if (search.trim() === '') {
@@ -39,12 +39,12 @@
 		});
 
 		if (result.length !== 0) {
-			filtered = result;
+			$filtered = result;
 		}
 	};
 
 	const reset = () => {
-		filtered = data.users;
+		$filtered = data.users;
 		search = '';
 	};
 
@@ -53,6 +53,7 @@
 	let search = '';
 
 	let alertState: Writable<'neutral' | 'error' | 'success'> = writable('neutral');
+	let alertErrorMessage = '';
 
 	const onSubmit = async () => {
 		// Programmatically click the button as daisyUI does not expose JS controls to close modals.
@@ -107,7 +108,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each filtered as item, i}
+				{#each $filtered as item, i}
 					<tr>
 						<td class="border-blue-300 border-[1px] ">
 							<a
@@ -148,18 +149,18 @@
 				}
 
 				return async ({ result, update }) => {
-					if (result.type !== 'success') {
+					if (result.type === 'failure') {
 						$alertState = 'error';
+						alertErrorMessage = result.data?.message;
 					} else {
 						$alertState = 'success';
+						await update({ reset: true });
 					}
 
 					// Remove the alert
 					setTimeout(() => {
 						$alertState = 'neutral';
 					}, 3000);
-
-					await update({ reset: false });
 				};
 			}}>
 			{#if $action === 'update'}
@@ -296,7 +297,7 @@
 	<div
 		in:fly={{ y: 100 }}
 		out:fade
-		class={`alert alert-${$alertState === 'error' ? 'error' : 'success'} shadow-lg`}>
+		class={`alert ${$alertState === 'error' ? 'alert-error' : 'alert-success'} shadow-lg`}>
 		<div>
 			{#if $alertState === 'error'}
 				<Warning size={24} />
@@ -304,7 +305,7 @@
 				<CheckmarkOutline size={24} />
 			{/if}
 			<span>
-				{$alertState === 'error' ? 'Error' : 'Success'}
+				{$alertState === 'error' ? alertErrorMessage : 'Success'}
 			</span>
 		</div>
 	</div>

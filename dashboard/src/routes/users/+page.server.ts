@@ -24,10 +24,13 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		throw error(401, 'Not logged in / Session expired');
 	}
 
-	const resp = await fetch(`${PUBLIC_SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/users`, {
-		method: 'GET',
-		headers: { Authorization: `Bearer ${token}` },
-	});
+	const resp = await fetch(
+		`${PUBLIC_SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/users`,
+		{
+			method: 'GET',
+			headers: { Authorization: `Bearer ${token}` },
+		}
+	);
 
 	const data: Array<UserModel> = await resp.json();
 
@@ -38,6 +41,13 @@ export const load: PageServerLoad = async ({ cookies }) => {
 	} satisfies { users: UserModel[] };
 };
 
+const checkAndConvertUndefined = (data: string): string | undefined => {
+	if (data.trim() === '') {
+		return undefined;
+	}
+	return data;
+};
+
 export const actions: Actions = {
 	default: async (event) => {
 		const data = await event.request.formData();
@@ -46,13 +56,13 @@ export const actions: Actions = {
 		const body: UserModel = {
 			registrationNumber: Number(data.get('registrationNumber')),
 			name: String(data.get('name')),
-			title: String(data.get('title')),
+			title: checkAndConvertUndefined(String(data.get('title'))),
 			phoneNumber: Number(data.get('phoneNumber')),
 			email: String(data.get('email')),
-			designation: String(data.get('designation')),
-			department: String(data.get('department')),
+			designation: checkAndConvertUndefined(String(data.get('designation'))),
+			department: checkAndConvertUndefined(String(data.get('department'))),
 			year: Number(data.get('year')),
-			remarks: String(data.get('remarks')),
+			remarks: checkAndConvertUndefined(String(data.get('remarks'))),
 			strikes: Number(data.get('strikes')),
 		};
 
@@ -71,8 +81,10 @@ export const actions: Actions = {
 
 			if (resp.status === 200) {
 				return { success: true };
+			} else {
+				const json = await resp.json();
+				return fail(resp.status, { message: json.message });
 			}
-			return { success: false };
 		} catch (err) {
 			return fail(500, { message: 'Server down' });
 		}
