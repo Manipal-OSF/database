@@ -68,14 +68,6 @@ fn validate(user: &UserModel) -> Result<(), ApiError> {
         ));
     }
 
-    // Email regex following Google RFC2822
-    // Yes, I know its insane
-    if user.email.matches(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?").count() == 0 {
-        return Err(ApiError::ValidationError(
-            "Invalid email entered".to_string(),
-        ));
-    }
-
     if let Some(title) = &user.designation {
         if !["Board", "Interim", "F1", "F2", "WC", "MC"].contains(&title.trim()) {
             return Err(ApiError::ValidationError(
