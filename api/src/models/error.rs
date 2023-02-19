@@ -8,6 +8,7 @@ use serde_json::json;
 #[derive(Debug)]
 pub enum ApiError {
     AuthenticationError,
+    ValidationError(String),
     ServerError(String),
 }
 
@@ -18,6 +19,7 @@ impl IntoResponse for ApiError {
                 StatusCode::UNAUTHORIZED,
                 "Authentication failed! Invalid credentials.".to_string(),
             ),
+            Self::ValidationError(message) => (StatusCode::UNPROCESSABLE_ENTITY, message),
             Self::ServerError(message) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 format!("Server Error | {message}"),

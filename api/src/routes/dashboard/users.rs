@@ -43,12 +43,80 @@ pub async fn get_all_users(
     Ok(Json(user_vec))
 }
 
+fn validate(user: &UserModel) -> Result<(), ApiError> {
+    if !user.name.is_ascii() {
+        return Err(ApiError::ValidationError(
+            "Invalid name entered".to_string(),
+        ));
+    } else if user.name.trim().is_empty() {
+        return Err(ApiError::ValidationError(
+            "Name cannot be empty".to_string(),
+        ));
+    }
+
+    if let Some(title) = &user.title {
+        if !["Founder", "CoFounder"].contains(&title.trim()) {
+            return Err(ApiError::ValidationError(
+                "Title has to be one of Founder or CoFounder".to_string(),
+            ));
+        }
+    }
+
+    if user.phone_number > 9999999999 {
+        return Err(ApiError::ValidationError(
+            "Phone number cannot be greater than 10 digits long".to_string(),
+        ));
+    }
+
+    // Email regex following Google RFC2822
+    // Yes, I know its insane
+    if user.email.matches(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?").count() == 0 {
+        return Err(ApiError::ValidationError(
+            "Invalid email entered".to_string(),
+        ));
+    }
+
+    if let Some(title) = &user.designation {
+        if !["Board", "Interim", "F1", "F2", "WC", "MC"].contains(&title.trim()) {
+            return Err(ApiError::ValidationError(
+                "Invalid designation entered".to_string(),
+            ));
+        }
+    }
+
+    if let Some(title) = &user.department {
+        if ![
+            "Academics",
+            "Development",
+            "Relations",
+            "Multimedia",
+            "CreatorCollaboratorProgram",
+        ]
+        .contains(&title.trim())
+        {
+            return Err(ApiError::ValidationError(
+                "Invalid department entered".to_string(),
+            ));
+        }
+    }
+
+    if user.year < 1 || user.year > 4 {
+        return Err(ApiError::ValidationError(
+            "Year can only be one of 1, 2, 3 and 4".to_string(),
+        ));
+    }
+
+    Ok(())
+}
+
 pub async fn update_user(
     _claims: Claims,
     State(state): State<Arc<AppState>>,
     Json(payload): Json<UserModel>,
 ) -> Result<Json<Vec<UserModel>>, ApiError> {
     // * PATCH /api/v1/dashboard/users
+
+    validate(&payload)?;
 
     let resp = state
         .db_client
@@ -79,6 +147,8 @@ pub async fn create_user(
     Json(payload): Json<UserModel>,
 ) -> Result<Json<Vec<UserModel>>, ApiError> {
     // * POST /api/v1/dashboard/users
+
+    validate(&payload)?;
 
     let resp = state
         .db_client
