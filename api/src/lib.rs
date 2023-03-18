@@ -5,7 +5,7 @@ use axum::{
     Router,
 };
 
-use dotenv::dotenv;
+use models::auth::Keys;
 use postgrest::Postgrest;
 use shuttle_secrets::SecretStore;
 use sync_wrapper::SyncWrapper;
@@ -14,7 +14,7 @@ mod models;
 mod routes;
 
 use routes::dashboard::{
-    auth::login,
+    auth::{login, KEYS},
     users::{create_user, get_all_users, update_user},
 };
 
@@ -37,8 +37,6 @@ impl AppState {
 async fn axum(
     #[shuttle_secrets::Secrets] secret_store: SecretStore,
 ) -> shuttle_service::ShuttleAxum {
-    dotenv().ok();
-
     let supabase_url = if cfg!(debug_assertions) {
         secret_store.get("DEV_SUPABASE_URL")
     } else {
@@ -51,6 +49,12 @@ async fn axum(
         secret_store.get("SUPABASE_KEY")
     }
     .expect("Supabase key not provided");
+
+    let secret = secret_store.get("SECRET").expect("JWT_SECRET must be set");
+    match KEYS.set(Keys::new(secret.as_bytes())) {
+        Ok(_) => (),
+        Err(_) => panic!("Failed to initialize KEYS"),
+    }
 
     let client = Postgrest::new(supabase_url).insert_header("apikey", supabase_key);
     let state = Arc::new(AppState::new(client));

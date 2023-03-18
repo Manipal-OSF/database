@@ -3,17 +3,14 @@ use std::sync::Arc;
 use axum::{extract::State, Json};
 use base64::{engine::general_purpose, Engine};
 use jsonwebtoken::{encode, Header};
-use once_cell::sync::Lazy;
+use once_cell::sync::OnceCell;
 use sha2::{Digest, Sha512};
 
 use crate::models::auth::{AuthBody, AuthModel, Claims, Keys, LoginPayload};
 use crate::models::error::ApiError;
 use crate::AppState;
 
-pub static KEYS: Lazy<Keys> = Lazy::new(|| {
-    let secret = std::env::var("SECRET").expect("JWT_SECRET must be set");
-    Keys::new(secret.as_bytes())
-});
+pub static KEYS: OnceCell<Keys> = OnceCell::new();
 
 pub async fn login(
     State(state): State<Arc<AppState>>,
@@ -38,7 +35,7 @@ pub async fn login(
 
     let claims = Claims { exp: 2000000000 };
 
-    let token = encode(&Header::default(), &claims, &KEYS.encoding)
+    let token = encode(&Header::default(), &claims, &KEYS.get().unwrap().encoding)
         .map_err(|_| ApiError::AuthenticationError)?;
 
     Ok(Json(AuthBody::new(token)))
