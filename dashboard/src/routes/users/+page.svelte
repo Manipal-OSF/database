@@ -16,12 +16,15 @@
 		name: '',
 		title: '',
 		phoneNumber: 0,
-		email: '@.com',
+		email: '',
 		designation: '',
 		department: '',
-		year: 1,
+		year: 0,
 		remarks: '',
 		strikes: 0,
+		discord: 0,
+		github: '',
+		location: '',
 	};
 
 	let filtered = writable(data.users);
@@ -105,10 +108,13 @@
 					<th class="border-blue-500 border-[1px]">Year</th>
 					<th class="border-blue-500 border-[1px]">Remarks</th>
 					<th class="border-blue-500 border-[1px]">Strikes</th>
+					<th class="border-blue-500 border-[1px]">Discord</th>
+					<th class="border-blue-500 border-[1px]">GitHub</th>
+					<th class="border-blue-500 border-[1px]">Location</th>
 				</tr>
 			</thead>
 			<tbody>
-				{#each $filtered as item, i}
+				{#each $filtered as item}
 					<tr>
 						<td class="border-blue-300 border-[1px] ">
 							<a
@@ -131,6 +137,9 @@
 						<td class="border-blue-300 border-[1px]">{item.year}</td>
 						<td class="border-blue-300 border-[1px]">{item.remarks ?? 'NULL'}</td>
 						<td class="border-blue-300 border-[1px]">{item.strikes}</td>
+						<td class="border-blue-300 border-[1px]">{item.discord ?? 'NULL'}</td>
+						<td class="border-blue-300 border-[1px]">{item.github ?? 'NULL'}</td>
+						<td class="border-blue-300 border-[1px]">{item.location}</td>
 					</tr>
 				{/each}
 			</tbody>
@@ -256,7 +265,6 @@
 				</label>
 				<input
 					type="number"
-					min="1"
 					id="year"
 					name="year"
 					class="input input-bordered w-full"
@@ -284,6 +292,42 @@
 					name="strikes"
 					class="input input-bordered w-full"
 					bind:value={$buffer.strikes} />
+			</div>
+			<div class="py-2">
+				<label class="label" for="discord">
+					<span class="label-text">Discord ID</span>
+				</label>
+				<input
+					type="number"
+					min="0"
+					id="discord"
+					name="discord"
+					class="input input-bordered w-full"
+					bind:value={$buffer.discord} />
+			</div>
+			<div class="py-2">
+				<label class="label" for="github">
+					<span class="label-text">GitHub ID</span>
+				</label>
+				<input
+					type="text"
+					min="0"
+					id="github"
+					name="github"
+					class="input input-bordered w-full"
+					bind:value={$buffer.github} />
+			</div>
+			<div class="py-2">
+				<label class="label" for="location">
+					<span class="label-text">Location</span>
+				</label>
+				<input
+					type="text"
+					min="0"
+					id="location"
+					name="location"
+					class="input input-bordered w-full"
+					bind:value={$buffer.location} />
 			</div>
 			<div class="modal-action">
 				<button type="submit" class="btn" on:click={() => onSubmit()}>Submit</button>
