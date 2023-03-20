@@ -15,6 +15,9 @@ export interface UserModel {
 	year: number;
 	remarks: string | undefined;
 	strikes: number;
+	discord: number | undefined;
+	github: string | undefined;
+	location: string;
 }
 
 export const load: PageServerLoad = async ({ cookies }) => {
@@ -41,8 +44,10 @@ export const load: PageServerLoad = async ({ cookies }) => {
 	} satisfies { users: UserModel[] };
 };
 
-const checkAndConvertUndefined = (data: string): string | undefined => {
-	if (data.trim() === '') {
+const checkAndConvertUndefined = <T>(data: T): T | undefined => {
+	if (typeof data === 'string' && data.trim() === '') {
+		return undefined;
+	} else if (typeof data === 'number' && data === 0) {
 		return undefined;
 	}
 	return data;
@@ -56,14 +61,17 @@ export const actions: Actions = {
 		const body: UserModel = {
 			registrationNumber: Number(data.get('registrationNumber')),
 			name: String(data.get('name')),
-			title: checkAndConvertUndefined(String(data.get('title'))),
+			title: checkAndConvertUndefined<string>(String(data.get('title'))),
 			phoneNumber: Number(data.get('phoneNumber')),
 			email: String(data.get('email')),
-			designation: checkAndConvertUndefined(String(data.get('designation'))),
-			department: checkAndConvertUndefined(String(data.get('department'))),
+			designation: checkAndConvertUndefined<string>(String(data.get('designation'))),
+			department: checkAndConvertUndefined<string>(String(data.get('department'))),
 			year: Number(data.get('year')),
-			remarks: checkAndConvertUndefined(String(data.get('remarks'))),
+			remarks: checkAndConvertUndefined<string>(String(data.get('remarks'))),
 			strikes: Number(data.get('strikes')),
+			discord: checkAndConvertUndefined<number>(Number(data.get('discord'))),
+			github: checkAndConvertUndefined<string>(String(data.get('github'))),
+			location: String(data.get('location')),
 		};
 
 		try {

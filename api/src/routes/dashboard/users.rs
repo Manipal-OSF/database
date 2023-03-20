@@ -18,9 +18,12 @@ pub struct UserModel {
     email: String,
     designation: Option<String>,
     department: Option<String>,
-    year: u8,
+    year: u16, // Year of joining college
     remarks: Option<String>,
     strikes: u8,
+    discord: Option<u64>,
+    github: Option<String>,
+    location: String,
 }
 
 pub async fn get_all_users(
@@ -44,6 +47,7 @@ pub async fn get_all_users(
 }
 
 fn validate(user: &UserModel) -> Result<(), ApiError> {
+    // Per field validation
     if !user.name.is_ascii() {
         return Err(ApiError::ValidationError(
             "Invalid name entered".to_string(),
@@ -92,9 +96,45 @@ fn validate(user: &UserModel) -> Result<(), ApiError> {
         }
     }
 
-    if user.year < 1 || user.year > 4 {
+    if user.year < 2000 {
         return Err(ApiError::ValidationError(
-            "Year can only be one of 1, 2, 3 and 4".to_string(),
+            "Year should be the year of joining the college.".to_string(),
+        ));
+    }
+
+    if !["Manipal", "Bangalore"].contains(&user.location.as_str().trim()) {
+        return Err(ApiError::ValidationError(
+            "Invalid location entered. Location should be either of Manipal or Bangalore."
+                .to_string(),
+        ));
+    }
+
+    // Related fields validation
+    if let Some(designation) = &user.designation {
+        if user.department == Some("Development".to_string())
+            && ["WC", "MC"].contains(&designation.as_str())
+        {
+            return Err(ApiError::ValidationError(
+                "User in Development department cannot have the WC or MC designation.".to_string(),
+            ));
+        }
+
+        if user.department != Some("Development".to_string())
+            && ["F1", "F2"].contains(&designation.as_str())
+        {
+            return Err(ApiError::ValidationError(
+                "Only users in Development department can have the F1 or F2 designation."
+                    .to_string(),
+            ));
+        }
+    }
+
+    if user.department == Some("Development".to_string())
+        && (user.discord.is_none() || user.github.is_none())
+    {
+        return Err(ApiError::ValidationError(
+            "Discord and GitHub ID cannot be null if the user is in the Development department."
+                .to_string(),
         ));
     }
 
