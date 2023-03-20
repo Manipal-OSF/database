@@ -8,7 +8,6 @@ use axum::{
 use models::auth::Keys;
 use postgrest::Postgrest;
 use shuttle_secrets::SecretStore;
-use sync_wrapper::SyncWrapper;
 
 mod models;
 mod routes;
@@ -33,10 +32,8 @@ impl AppState {
     }
 }
 
-#[shuttle_service::main]
-async fn axum(
-    #[shuttle_secrets::Secrets] secret_store: SecretStore,
-) -> shuttle_service::ShuttleAxum {
+#[shuttle_runtime::main]
+async fn axum(#[shuttle_secrets::Secrets] secret_store: SecretStore) -> shuttle_axum::ShuttleAxum {
     let supabase_url = if cfg!(debug_assertions) {
         secret_store.get("DEV_SUPABASE_URL")
     } else {
@@ -68,7 +65,5 @@ async fn axum(
         )
         .with_state(state);
 
-    let sync_wrapper = SyncWrapper::new(router);
-
-    Ok(sync_wrapper)
+    Ok(router.into())
 }
