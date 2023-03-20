@@ -110,6 +110,25 @@ fn validate(user: &UserModel) -> Result<(), ApiError> {
     }
 
     // Related fields validation
+    if let Some(designation) = &user.designation {
+        if user.department == Some("Development".to_string())
+            && ["WC", "MC"].contains(&designation.as_str())
+        {
+            return Err(ApiError::ValidationError(
+                "User in Development department cannot have the WC or MC designation.".to_string(),
+            ));
+        }
+
+        if user.department != Some("Development".to_string())
+            && ["F1", "F2"].contains(&designation.as_str())
+        {
+            return Err(ApiError::ValidationError(
+                "Only users in Development department can have the F1 or F2 designation."
+                    .to_string(),
+            ));
+        }
+    }
+
     if user.department == Some("Development".to_string())
         && (user.discord.is_none() || user.github.is_none())
     {
