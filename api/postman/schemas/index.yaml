@@ -37,6 +37,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api/v1/bot/users:
+    get:
+      summary: Get bot users
+      responses:
+        200:
+          description: Array of all bot users
+          content:
+            application/json:
+              schema:
+                type: string
+
   /api/v1/dashboard/users:
     get:
       summary: Get all users
@@ -128,7 +139,7 @@ components:
           type: string
 
     UserArray:
-      description: Array of user table fields
+      description: Array of usersuser's 
       required:
         - users
       properties:
@@ -143,7 +154,6 @@ components:
       description: A user
       type: object
       required:
-        - uuid
         - name
         - designation
         - registrationNumber
@@ -153,10 +163,6 @@ components:
         - year
         - location
       properties:
-        uuid:
-          type: string
-          description: An universally unique identification
-          example: 1
         name:
           type: string
           description: The name of the user
@@ -170,7 +176,7 @@ components:
           example: "Founder"
         designation:
           type: array
-          description: Current designation(s) in the flat or normal hierarchies
+          description: Current designation in the flat or normal hierarchies
           items:
             type: string
             enum:
@@ -213,16 +219,10 @@ components:
               - Relations
               - Multimedia
               - CreatorCollaboratorProgram
-          example: ["Academics", "Development"]
         year:
           type: integer
-          description: The current college year the user is in
-          enum:
-            - 1
-            - 2
-            - 3
-            - 4
-          example: 1
+          description: The year of joining the college
+          example: 2023
         remarks:
           type: string
           description: Remarks for a particular user as given by the Board
