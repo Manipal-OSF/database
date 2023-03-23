@@ -60,7 +60,7 @@ async fn axum(#[shuttle_secrets::Secrets] secret_store: SecretStore) -> shuttle_
 
     let router = Router::new()
         .route("/", get(index))
-        .route("/api/v1/dashboard/login", post(login))
+        .route("/api/v1/login", post(login))
         .route(
             "/api/v1/dashboard/users",
             get(get_all_users).patch(update_user).post(create_user),
