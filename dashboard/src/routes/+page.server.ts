@@ -9,10 +9,10 @@ export const actions: Actions = {
 		let json;
 		try {
 			const resp = await event.fetch(
-				`${PUBLIC_SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/dashboard/login`,
+				`${PUBLIC_SERVER_URL ?? 'http://127.0.0.1:8000'}/api/v1/login`,
 				{
 					method: 'POST',
-					body: JSON.stringify({ api_key: key }),
+					body: JSON.stringify({ api_key: key, is_dashboard: true }),
 					headers: { 'Content-Type': 'application/json' },
 				}
 			);

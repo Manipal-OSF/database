@@ -6,7 +6,7 @@ use axum::{async_trait, RequestPartsExt, TypedHeader};
 use jsonwebtoken::{decode, DecodingKey, EncodingKey, Validation};
 use serde::{Deserialize, Serialize};
 
-use crate::routes::dashboard::auth::KEYS;
+use crate::auth::KEYS;
 
 use super::error::ApiError;
 
@@ -19,6 +19,7 @@ pub struct AuthModel {
 #[derive(Deserialize, Serialize)]
 pub struct LoginPayload {
     pub api_key: String,
+    pub is_dashboard: bool,
 }
 
 #[derive(Deserialize, Serialize, Debug)]

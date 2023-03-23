@@ -9,12 +9,14 @@ use models::auth::Keys;
 use postgrest::Postgrest;
 use shuttle_secrets::SecretStore;
 
+mod auth;
 mod models;
 mod routes;
 
-use routes::dashboard::{
-    auth::{login, KEYS},
-    users::{create_user, get_all_users, update_user},
+use auth::{login, KEYS};
+use routes::{
+    bot::bot_users::{create_bot_user, delete_bot_user, get_all_bot_users, update_bot_user},
+    dashboard::users::{create_user, get_all_users, update_user},
 };
 
 async fn index() -> &'static str {
@@ -58,10 +60,17 @@ async fn axum(#[shuttle_secrets::Secrets] secret_store: SecretStore) -> shuttle_
 
     let router = Router::new()
         .route("/", get(index))
-        .route("/api/v1/dashboard/login", post(login))
+        .route("/api/v1/login", post(login))
         .route(
             "/api/v1/dashboard/users",
             get(get_all_users).patch(update_user).post(create_user),
+        )
+        .route(
+            "/api/v1/bot/users",
+            get(get_all_bot_users)
+                .patch(update_bot_user)
+                .post(create_bot_user)
+                .delete(delete_bot_user),
         )
         .with_state(state);
 

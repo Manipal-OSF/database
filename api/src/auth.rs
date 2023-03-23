@@ -16,12 +16,19 @@ pub async fn login(
     State(state): State<Arc<AppState>>,
     payload: Json<LoginPayload>,
 ) -> Result<Json<AuthBody>, ApiError> {
-    // * POST /api/v1/dashboard/login
+    // * POST /api/v1/login
 
     let json = &state
         .db_client
         .from("auth")
-        .eq("id", "dashboard")
+        .eq(
+            "id",
+            if payload.is_dashboard {
+                "dashboard"
+            } else {
+                "bot"
+            },
+        )
         .select("*")
         .single()
         .execute()
