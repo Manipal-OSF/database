@@ -21,7 +21,14 @@ pub async fn login(
     let json = &state
         .db_client
         .from("auth")
-        .eq("id", "dashboard")
+        .eq(
+            "id",
+            if payload.is_dashboard {
+                "dashboard"
+            } else {
+                "bot"
+            },
+        )
         .select("*")
         .single()
         .execute()

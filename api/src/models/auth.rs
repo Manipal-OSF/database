@@ -19,6 +19,7 @@ pub struct AuthModel {
 #[derive(Deserialize, Serialize)]
 pub struct LoginPayload {
     pub api_key: String,
+    pub is_dashboard: bool,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
