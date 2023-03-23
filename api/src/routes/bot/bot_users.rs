@@ -14,7 +14,7 @@ pub struct BotUserModel {
     id: u64,
     discriminator: String,
     username: String,
-    avatar: String,
+    avatar: Option<String>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -45,6 +45,11 @@ pub async fn get_all_bot_users(
 
 fn validate(user: &BotUserModel) -> Result<(), ApiError> {
     // Per field validation
+    if user.discriminator.chars().count() != 4 {
+        return Err(ApiError::ValidationError(
+            "Discriminator has to be 4 letters in length.".to_string(),
+        ));
+    }
 
     // Related fields validation
 
@@ -112,7 +117,7 @@ pub async fn delete_bot_user(
     _claims: Claims,
     State(state): State<Arc<AppState>>,
     Json(payload): Json<IDPayload>,
-) -> Result<String, ApiError> {
+) -> Result<Json<Vec<BotUserModel>>, ApiError> {
     // * DELETE /api/v1/bot/users
 
     let resp = state
@@ -124,12 +129,10 @@ pub async fn delete_bot_user(
         .await
         .map_err(|err| ApiError::ServerError(err.to_string()))?;
 
-    println!("{resp:?}");
+    let model = resp
+        .json::<Vec<BotUserModel>>()
+        .await
+        .map_err(|err| ApiError::ServerError(err.to_string()))?;
 
-    // let model = resp
-    //     .json::<Vec<BotUserModel>>()
-    //     .await
-    //     .map_err(|err| ApiError::ServerError(err.to_string()))?;
-
-    return Ok("Success".to_string());
+    Ok(Json(model))
 }
