@@ -9,15 +9,14 @@ use models::auth::Keys;
 use postgrest::Postgrest;
 use shuttle_secrets::SecretStore;
 
+mod auth;
 mod models;
 mod routes;
 
+use auth::{login, KEYS};
 use routes::{
     bot::bot_users::{create_bot_user, delete_bot_user, get_all_bot_users, update_bot_user},
-    dashboard::{
-        auth::{login, KEYS},
-        users::{create_user, get_all_users, update_user},
-    },
+    dashboard::users::{create_user, get_all_users, update_user},
 };
 
 async fn index() -> &'static str {
