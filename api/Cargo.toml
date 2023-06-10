@@ -6,24 +6,24 @@ publish = false
 
 [dependencies]
 postgrest = "1.0"
-shuttle-runtime = "0.12.0"
-shuttle-axum = "0.12.0"
-axum = { version = "0.6.10", features = ["headers"] }
-sync_wrapper = "0.1.1"
-shuttle-secrets = "0.12.0"
-hyper = { version = "0.14.23", features = ["full"] }
-tokio = { version = "1.26.0", features = ["full"] }
+shuttle-runtime = "0.18.0"
+shuttle-axum = "0.18.0"
+shuttle-secrets = "0.18.0"
+axum = { version = "0.6.18", features = ["headers"] }
+sync_wrapper = "0.1.2"
+hyper = { version = "0.14.26", features = ["full"] }
+tokio = { version = "1.28.2", features = ["full"] }
 tower = "0.4.13"
-uuid = "1.2.2"
-serde_json = "1.0.91"
-serde = "1.0.152"
+uuid = "1.3.3"
+serde_json = "1.0.96"
+serde = "1.0.164"
 axum-login = "0.4.1"
 rand = "0.8.5"
 sha2 = "0.10.6"
-base64 = "0.21.0"
-reqwest = { version = "0.11.14", features = ["json"] }
-jsonwebtoken = "8.2.0"
-once_cell = "1.17.1"
+base64 = "0.21.2"
+reqwest = { version = "0.11.18", features = ["json"] }
+jsonwebtoken = "8.3.0"
+once_cell = "1.18.0"
 
 [profile.dev.package.num-bigint-dig]
 opt-level = 3
