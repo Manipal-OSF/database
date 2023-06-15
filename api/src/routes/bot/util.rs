@@ -11,6 +11,11 @@ pub struct Payload {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct JsonResponse {
+    discord: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Response {
     result: bool,
 }
@@ -32,13 +37,11 @@ pub async fn validate_discord_id(
             ))
         })?;
 
-    println!(
-        "{}",
-        result
-            .text()
-            .await
-            .map_err(|_| ApiError::AuthenticationError)?
-    );
+    let count = result
+        .json::<Vec<JsonResponse>>()
+        .await
+        .map_err(|_| ApiError::AuthenticationError)?
+        .len();
 
-    Ok(Json(Response { result: true }))
+    Ok(Json(Response { result: count != 0 }))
 }
