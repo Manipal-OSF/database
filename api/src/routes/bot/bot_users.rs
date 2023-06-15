@@ -12,9 +12,6 @@ use crate::{
 #[serde(rename_all = "camelCase")]
 pub struct BotUserModel {
     id: u64,
-    discriminator: String,
-    username: String,
-    avatar: Option<String>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -43,13 +40,13 @@ pub async fn get_all_bot_users(
     Ok(Json(user_vec))
 }
 
-fn validate(user: &BotUserModel) -> Result<(), ApiError> {
+fn validate(_: &BotUserModel) -> Result<(), ApiError> {
     // Per field validation
-    if user.discriminator.chars().count() != 4 {
-        return Err(ApiError::ValidationError(
-            "Discriminator has to be 4 letters in length.".to_string(),
-        ));
-    }
+    // if user.discriminator.chars().count() != 4 {
+    //     return Err(ApiError::ValidationError(
+    //         "Discriminator has to be 4 letters in length.".to_string(),
+    //     ));
+    // }
 
     // Related fields validation
 

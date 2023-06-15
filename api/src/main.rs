@@ -15,7 +15,10 @@ mod routes;
 
 use auth::{login, KEYS};
 use routes::{
-    bot::bot_users::{create_bot_user, delete_bot_user, get_all_bot_users, update_bot_user},
+    bot::{
+        bot_users::{create_bot_user, delete_bot_user, get_all_bot_users, update_bot_user},
+        util::validate_discord_id,
+    },
     dashboard::users::{create_user, get_all_users, update_user},
 };
 
@@ -72,6 +75,7 @@ async fn axum(#[shuttle_secrets::Secrets] secret_store: SecretStore) -> shuttle_
                 .post(create_bot_user)
                 .delete(delete_bot_user),
         )
+        .route("/api/v1/bot/validate", get(validate_discord_id))
         .with_state(state);
 
     Ok(router.into())
