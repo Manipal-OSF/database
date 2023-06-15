@@ -9,7 +9,7 @@ postgrest = "1.0"
 shuttle-runtime = "0.18.0"
 shuttle-axum = "0.18.0"
 shuttle-secrets = "0.18.0"
-axum = { version = "0.6.18", features = ["headers"] }
+axum = { version = "0.6.18", features = ["headers", "macros"] }
 sync_wrapper = "0.1.2"
 hyper = { version = "0.14.26", features = ["full"] }
 tokio = { version = "1.28.2", features = ["full"] }
