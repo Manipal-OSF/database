@@ -21,7 +21,7 @@ pub struct UserModel {
     year: u16, // Year of joining college
     remarks: Option<String>,
     strikes: u8,
-    discord: Option<u64>,
+    discord: Option<String>,
     github: Option<String>,
     location: String,
 }

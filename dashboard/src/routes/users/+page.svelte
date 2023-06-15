@@ -22,7 +22,7 @@
 		year: 0,
 		remarks: '',
 		strikes: 0,
-		discord: 0,
+		discord: '',
 		github: '',
 		location: '',
 	};

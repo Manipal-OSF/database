@@ -15,7 +15,7 @@ export interface UserModel {
 	year: number;
 	remarks: string | undefined;
 	strikes: number;
-	discord: number | undefined;
+	discord: string | undefined;
 	github: string | undefined;
 	location: string;
 }
@@ -69,7 +69,7 @@ export const actions: Actions = {
 			year: Number(data.get('year')),
 			remarks: checkAndConvertUndefined<string>(String(data.get('remarks'))),
 			strikes: Number(data.get('strikes')),
-			discord: checkAndConvertUndefined<number>(Number(data.get('discord'))),
+			discord: checkAndConvertUndefined<string>(String(data.get('discord'))),
 			github: checkAndConvertUndefined<string>(String(data.get('github'))),
 			location: String(data.get('location')),
 		};
